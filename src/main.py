@@ -144,18 +144,25 @@ class CinemaXXIScrapper:
         return json.dumps({
             'movieName': soup.find_all('div', class_='col-xs-8 col-sm-11 col-md-11')[0].find_next('div').text,
             'info': {
-                'genre': soup.find_all('div', class_='col-xs-8 col-sm-11 col-md-11')[1].find_next('div').text,
+                'genre': soup.find_all('div', class_='col-xs-8 col-sm-11 col-md-11')[1].find_next('div').text.replace(
+                    ", ", ",").split(","),
+                'dimensions': data.find_all('p')[1].text[1:],
                 'duration': data.find_all('p')[0].text[1:],
+                'ageRate': soup.find('div', class_='col-xs-3 col-sm-1 col-md-1').find('img').get('src'),
+                'image': soup.find('div', class_='col-md-3 col-sm-6 col-xs-6').find('img').get('src'),
                 'trailer': data.find_all('p')[4].find_next('button').get('onclick').replace("location.href = '", "")[
                            0:-2],
                 'desc': soup.find('p', id='description').text,
                 'producer': soup.find_all('p', style='margin-bottom: 5px')[0].find_next('p').text[1:],
                 'director': soup.find_all('p', style='margin-bottom: 5px')[1].find_next('p').text,
-                'writer': soup.find_all('p', style='margin-bottom: 5px')[2].find_next('p').text,
-                'cast': soup.find_all('p', style='margin-bottom: 5px')[3].find_next('p').text,
+                'writer': soup.find_all('p', style='margin-bottom: 5px')[2].find_next('p').text.replace(", ",
+                                                                                                        ",").split(","),
+                'cast': soup.find_all('p', style='margin-bottom: 5px')[3].find_next('p').text.replace(", ", ",").split(
+                    ","),
                 'distributor': soup.find_all('p', style='margin-bottom: 5px')[4].find_next('p').text,
             },
-        }, indent=4)
+        },
+            indent=4)
 
     def getSchedule(self, cinema_id):
         """
@@ -163,46 +170,59 @@ class CinemaXXIScrapper:
 
         :param cinema_id: The cinema ID
         """
-        list_data = []
+        list_data_final = []
+        list_data_collection = []
 
         request_getSchedule = requests.get(
             url=self.endPoint + "gui.schedule.php?sid=&find_by=1&cinema_id={cinema_id}&movie_id=".format(
                 cinema_id=cinema_id)
         )
         soup = BeautifulSoup(request_getSchedule.text, 'html.parser')
-        i = 0
-        for data in soup.find_all('li', class_='list-group-item'):
-            data_status = []
-            for datas in soup.find_all('p', class_='p_time pull-left')[i].findAllNext('a'):
+
+        time_data = []
+        for a in range(0, len(soup.find_all('p', class_='p_time pull-left'))):
+            time_data.append(soup.find_all('p', class_='p_time pull-left')[a].text)
+
+        data_status = []
+        for datas in soup.find_all('p', class_='p_time pull-left'):
+            for data_ in datas.find_all('a'):
                 try:
-                    if "disabled" in " ".join(datas['class']):
+                    if "disabled" in " ".join(data_['class']):
                         data_status.append(False)
                     else:
                         data_status.append(True)
-
                 except KeyError:
                     break
-                continue
 
-            list_data.append({
+        for collection in range(0, len(time_data)):
+            data_collection = []
+            for collectione in range(len(data_status[0: len(time_data[collection].split(" ")[0:-1])])):
+                data_collection.append({
+                    'time' : time_data[collection].split(" ")[0:-1][collectione],
+                    'can_booking' : data_status[0: len(time_data[collection].split(" ")[0:-1])][collectione]
+                })
+            list_data_collection.append(data_collection)
+
+        i = 0
+        for data in soup.find_all('li', class_='list-group-item'):
+            list_data_final.append({
                 'movieName': data.find('a').find_next('a').text,
+                'dimensions': soup.find('span', class_='btn btn-default btn-outline disabled').text,
                 'image': data.find('a').find_next('img').get('src'),
                 'date': data.find('p', class_='p_date').text,
                 'price': data.find('span', class_='p_price').text,
-                'schedule': {
-                    'time': soup.find_all('p', class_='p_time pull-left')[i].text[0:-1].split(" "),
-                    'status': data_status
-                }
+                'location': soup.find('a', class_='map-link').get('href'),
+                'schedule': list_data_collection[i]
 
             })
-
-        i += 1
+            i += 1
 
         return json.dumps(
             {
                 'cinemaName': soup.find('h4').find('span').find('strong').text,
-                'info': soup.find_all('h4')[1].find_next('span').text.replace("TELEPON", " TELEPON"),
-                'data': list_data,
+                'address': soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[0],
+                'contact': soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[1].split(": ")[1],
+                'data': list_data_final,
             },
             indent=4
         )
