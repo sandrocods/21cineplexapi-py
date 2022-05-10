@@ -4,6 +4,17 @@
 Scraping data dari 21cineplex untuk keperluan pembelajaran dan riset, tidak ada hal yang berbahaya atau dapat merugikan website sumber.
 
 
+## 🔗 Demo in Vercel.app
+ [![VercelLogo](https://img.shields.io/badge/Vercel-000?style=for-the-badge&logo=vercel&logoColor=white)](https://cinema-21-scrapper.vercel.app/)
+- [Get Coming Soon Movies](https://cinema-21-scrapper.vercel.app/getComingSoon)
+- [Get Currently Playing](https://cinema-21-scrapper.vercel.app/getCurrentlyPlaying)
+- [Get CityId](https://cinema-21-scrapper.vercel.app/getCityId)
+- [Get Theaters](https://cinema-21-scrapper.vercel.app/getTheaters/29)
+- [Get Movies](https://cinema-21-scrapper.vercel.app/getMovies/22DSX2)
+- [Get Schedule Movies](https://cinema-21-scrapper.vercel.app/getSchedule/SKAGRAN)
+- [Get Foods & Beverages](https://cinema-21-scrapper.vercel.app/getFoodsBeverages/SKAGRAN)
+
+
 ## Build With
 
  - [Python3](https://www.python.org/)
