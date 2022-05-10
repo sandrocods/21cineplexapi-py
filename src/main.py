@@ -146,14 +146,14 @@ class CinemaXXIScrapper:
             'info': {
                 'genre': soup.find_all('div', class_='col-xs-8 col-sm-11 col-md-11')[1].find_next('div').text.replace(
                     ", ", ",").split(","),
-                'dimensions': data.find_all('p')[1].text[1:],
-                'duration': data.find_all('p')[0].text[1:],
+                'dimensions': data.find_all('p')[1].text.strip(),
+                'duration': data.find_all('p')[0].text.strip(),
                 'ageRate': soup.find('div', class_='col-xs-3 col-sm-1 col-md-1').find('img').get('src'),
                 'image': soup.find('div', class_='col-md-3 col-sm-6 col-xs-6').find('img').get('src'),
                 'trailer': data.find_all('p')[4].find_next('button').get('onclick').replace("location.href = '", "")[
                            0:-2],
                 'desc': soup.find('p', id='description').text,
-                'producer': soup.find_all('p', style='margin-bottom: 5px')[0].find_next('p').text[1:],
+                'producer': soup.find_all('p', style='margin-bottom: 5px')[0].find_next('p').text.strip(),
                 'director': soup.find_all('p', style='margin-bottom: 5px')[1].find_next('p').text,
                 'writer': soup.find_all('p', style='margin-bottom: 5px')[2].find_next('p').text.replace(", ",
                                                                                                         ",").split(","),
@@ -198,8 +198,8 @@ class CinemaXXIScrapper:
             data_collection = []
             for collectione in range(len(data_status[0: len(time_data[collection].split(" ")[0:-1])])):
                 data_collection.append({
-                    'time' : time_data[collection].split(" ")[0:-1][collectione],
-                    'can_booking' : data_status[0: len(time_data[collection].split(" ")[0:-1])][collectione]
+                    'time': time_data[collection].split(" ")[0:-1][collectione],
+                    'can_booking': data_status[0: len(time_data[collection].split(" ")[0:-1])][collectione]
                 })
             list_data_collection.append(data_collection)
 
@@ -207,11 +207,13 @@ class CinemaXXIScrapper:
         for data in soup.find_all('li', class_='list-group-item'):
             list_data_final.append({
                 'movieName': data.find('a').find_next('a').text,
-                'dimensions': soup.find('span', class_='btn btn-default btn-outline disabled').text,
                 'image': data.find('a').find_next('img').get('src'),
+                'dimensions': data.find_all('span', class_='btn btn-default btn-outline disabled')[0].text,
+                'ageRate': data.find_all('span', class_='btn btn-default btn-outline disabled')[1].text,
+                'duration': data.find('div', style='margin-top:10px; font-size:12px; color:#999').text.strip(),
                 'date': data.find('p', class_='p_date').text,
                 'price': data.find('span', class_='p_price').text,
-                'location': soup.find('a', class_='map-link').get('href'),
+
                 'schedule': list_data_collection[i]
 
             })
@@ -220,8 +222,11 @@ class CinemaXXIScrapper:
         return json.dumps(
             {
                 'cinemaName': soup.find('h4').find('span').find('strong').text,
+                'location': soup.find('a', class_='map-link').get('href'),
                 'address': soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[0],
-                'contact': soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[1].split(": ")[1],
+                'contact':
+                    soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[1].split(": ")[
+                        1],
                 'data': list_data_final,
             },
             indent=4
@@ -328,12 +333,15 @@ class CinemaXXIScrapper:
                     pass
 
         return json.dumps({
-            'Paket': list_data_paket,
-            'Bakery': list_data_bakery,
-            'Drinks': list_data_drinks,
-            'Popcorn': list_data_popcorn,
-            'Fritters': list_data_fritters,
-            'Lightmeal': list_data_lightmeal,
-            'Snackcandy': list_data_snackcandy
+            'cinema': soup.find('span', style='font-weight: bold;').text.split("-")[1].strip(),
+            'data_food': {
+                'Paket': list_data_paket,
+                'Bakery': list_data_bakery,
+                'Drinks': list_data_drinks,
+                'Popcorn': list_data_popcorn,
+                'Fritters': list_data_fritters,
+                'Lightmeal': list_data_lightmeal,
+                'Snackcandy': list_data_snackcandy
+            },
 
         }, indent=4)

@@ -6,6 +6,11 @@ app = Flask(__name__)
 cinemaClass = CinemaXXIScrapper()
 
 
+@app.route("/")
+def Home():
+    return "<a href=""https://github.com/sandrocods/21cineplexapi-py"">Visit Github for API Refrence</a>"
+
+
 @app.route("/getComingSoon")
 def getComingSoon():
     return cinemaClass.getComingSoon()
