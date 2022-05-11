@@ -224,9 +224,7 @@ class CinemaXXIScrapper:
                 'cinemaName': soup.find('h4').find('span').find('strong').text,
                 'location': soup.find('a', class_='map-link').get('href'),
                 'address': soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[0],
-                'contact':
-                    soup.find_all('h4')[1].find_next('span').get_text(separator="<br/>").split("<br/>")[1].split(": ")[
-                        1],
+                'contact': '',
                 'data': list_data_final,
             },
             indent=4

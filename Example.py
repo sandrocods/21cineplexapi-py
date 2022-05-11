@@ -2,7 +2,7 @@ from src.main import *
 
 cinemaClass = CinemaXXIScrapper()
 print(
-    cinemaClass.getSchedule(cinema_id='JKTARGA')
+    cinemaClass.getSchedule(cinema_id='SKASOSQ')
 )
 
 print(
